@@ -93,7 +93,7 @@ const register = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
     try {
-        const result = await db.query("SELECT * FROM products");
+        const result = await db.query("SELECT * FROM products ORDER BY id ASC");
         res.json(result.rows);
     } catch (error) {
         res.status(500).json({ message: error.message });

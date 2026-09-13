@@ -19,6 +19,8 @@ app.get( "/api/products",authenticateToken, getAllProducts);
 app.get( "/api/customers", authenticateToken, getAllCustomers);
 app.post('/api/products', authenticateToken, isAdmin, createProduct);
 app.post('/api/users/register', register);
+
+app.get('/api/products/:id', authenticateToken, isAdmin, productsController.getProductById);
 app.put('/api/products/:id', authenticateToken, isAdmin, productsController.updateProduct);
 app.delete('/api/products/:id', authenticateToken, isAdmin, productsController.deleteProduct);
 
