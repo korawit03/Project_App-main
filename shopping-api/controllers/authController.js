@@ -90,7 +90,7 @@ const register = async (req, res) => {
     }
 };
 
-module.exports = { login, getAllProducts, getAllCustomers, register };
+
 const getAllProducts = async (req, res) => {
     try {
         const result = await db.query("SELECT * FROM products");
@@ -111,4 +111,4 @@ const getAllCustomers = async (req, res) => {
         res.status(500).json({ success: false, message: "Server error" });
     }
 };
-module.exports = { login, getAllProducts, getAllCustomers };
+module.exports = { login, getAllProducts, getAllCustomers , register };
