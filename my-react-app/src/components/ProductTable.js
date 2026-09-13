@@ -13,18 +13,18 @@ function ProductTable() {
     api.get("api/products", {
       headers: { Authorization: "Bearer " + token }
     })
-    .then(function (res) {
-      setItems(res.data);
-      setLoading(false);
-    })
-    .catch(function (err) {
-      var msg = "โหลดรายการสินค้าไม่สำเร็จ";
-      if (err && err.response && err.response.data && err.response.data.error) {
-        msg = err.response.data.error;
-      }
-      setMessage(msg);
-      setLoading(false);
-    });
+      .then(function (res) {
+        setItems(res.data);
+        setLoading(false);
+      })
+      .catch(function (err) {
+        var msg = "โหลดรายการสินค้าไม่สำเร็จ";
+        if (err && err.response && err.response.data && err.response.data.error) {
+          msg = err.response.data.error;
+        }
+        setMessage(msg);
+        setLoading(false);
+      });
   }, []); // โหลดครั้งแรกเมื่อ component mount
 
   if (loading) {
@@ -36,9 +36,44 @@ function ProductTable() {
   }
 
   return (
-    <>
-      {/* JSX next slide */}
-    </>
+    <div>
+      <h3>Products</h3>
+      <table border="1" cellPadding="6" cellSpacing="0">
+        <thead>
+          <tr>
+            <th style={{ textAlign: "left" }}>ID</th>
+            <th style={{ textAlign: "left" }}>Name</th>
+            <th style={{ textAlign: "left" }}>Category</th>
+            <th style={{ textAlign: "right" }}>Price</th>
+            <th style={{ textAlign: "right" }}>Stock</th>
+            <th style={{ textAlign: "center" }}>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items && items.map(function (item) {
+            return (
+              <tr key={item.id}>
+                <td>{item.id}</td>
+                <td>{item.name}</td>
+                <td>{item.category}</td>
+                <td style={{ textAlign: "right" }}>{Number(item.price).toFixed(2)}</td>
+                <td style={{ textAlign: "right" }}>{item.stock}</td>
+                <td style={{ textAlign: "center" }}>
+                  <Link to={"/admin/products/" + item.id + "/edit"}>
+                    <button>Edit</button>
+                  </Link>
+                </td>
+              </tr>
+            );
+          })}
+          {(!items || items.length === 0) && (
+            <tr>
+              <td colSpan="6">ยังไม่มีสินค้า</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

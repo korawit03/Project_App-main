@@ -14,11 +14,24 @@ import ProductDetail from './components/ProductDetail';
 import Login from './components/login';
 import AdminPage from './components/AdminPage';
 import Customers from "./components/Customers";
+import Register from './components/Register';
 
 function App() {
     const [token, setToken] = useState(
         localStorage.getItem("token")
     );
+
+    // เพิ่มตรงนี้: ดึง role ออกจาก token
+    const getRole = (t) => {
+        if (!t) return null;
+        try {
+            return JSON.parse(atob(t.split(".")[1])).role;
+        } catch {
+            return null;
+        }
+    };
+    const role = getRole(token);
+
     const handleLogout = () => {
         localStorage.removeItem("token");
         setToken(null);
@@ -29,21 +42,29 @@ function App() {
     return (
         <Router>
             <nav className="p-4 bg-gray-200">
-                <Link to="/" className="mr-4">Home</Link> |{' '}
-                <Link to="/about" className="mr-4">About</Link> |{' '}
-                <Link to="/contact" className="mr-4">Contact</Link>|{' '}
-                <Link to="/products" className="mr-4">Products</Link>
-                
-                {token ? (
-                    <button onClick={handleLogout}>
-                        Logout
-                    </button>
+                {role === "admin" ? (
+                    <ul style={{ listStyleType: "none", padding: 0, display: "inline" }}>
+                        <li style={{ display: "inline", marginRight: "10px" }}>
+                            <Link to="/admin/products">Products</Link>
+                        </li>
+                        <li style={{ display: "inline", marginRight: "10px" }}>
+                            <Link to="/admin/products/new">Add New Product</Link>
+                        </li>
+                    </ul>
                 ) : (
-                    <Link to="/login">
-                        Login
-                    </Link>
+                    <>
+                        <Link to="/" className="mr-4">Home</Link> |{' '}
+                        <Link to="/about" className="mr-4">About</Link> |{' '}
+                        <Link to="/contact" className="mr-4">Contact</Link>|{' '}
+                        <Link to="/products" className="mr-4">Products</Link>
+                    </>
                 )}
-
+                {' '}
+                {token ? (
+                    <button onClick={handleLogout}>Logout</button>
+                ) : (
+                    <Link to="/login">Login</Link>
+                )}
             </nav>
             <Routes>
                 <Route path="/" element={<Home />} />
@@ -52,8 +73,9 @@ function App() {
                 <Route path="/products/new" element={<ProductCreate />} />
                 <Route path="/products" element={<Products />} />
                 <Route path="/products/:id" element={<ProductDetail />} />
-                <Route path="/customers" element={<Customers />}/>
+                <Route path="/customers" element={<Customers />} />
                 <Route path="/login" element={<Login setToken={setToken} />} />
+                <Route path="/register" element={<Register />} />
                 <Route path="/admin/*" element={<AdminPage />} />
             </Routes>
         </Router>

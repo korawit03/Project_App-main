@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const { login, getAllProducts, getAllCustomers } = require('./controllers/authController');
+const { login, getAllProducts, getAllCustomers , register } = require('./controllers/authController');
 const {authenticateToken, isAdmin} = require("./middleware/authMiddleware");
 const {createProduct } = require('./controllers/productsController');
 
@@ -17,6 +17,7 @@ console.log("Check Controller:", typeof getAllProducts);
 app.get( "/api/products",authenticateToken, getAllProducts);
 app.get( "/api/customers", authenticateToken, getAllCustomers);
 app.post('/api/products', authenticateToken, isAdmin, createProduct);
+app.post('/api/users/register', register);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

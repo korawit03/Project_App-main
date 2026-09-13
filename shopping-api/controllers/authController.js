@@ -49,6 +49,48 @@ const login = async (req, res) => {
     }
 
 };
+
+const register = async (req, res) => {
+    const { username, password, fullname } = req.body;
+
+    if (!username || !password || !fullname) {
+        return res.status(400).json({
+            success: false,
+            message: "กรุณากรอก Username, Password และ Fullname ให้ครบ"
+        });
+    }
+
+    try {
+        const existing = await db.query(
+            "SELECT id FROM users WHERE username = $1",
+            [username]
+        );
+        if (existing.rows.length > 0) {
+            return res.status(409).json({
+                success: false,
+                message: "Username นี้ถูกใช้งานแล้ว"
+            });
+        }
+
+        const hash = await bcrypt.hash(password, 10);
+        await db.query(
+            "INSERT INTO users (username, password, fullname, role) VALUES ($1, $2, $3, $4)",
+            [username, hash, fullname, "user"]
+        );
+
+        res.status(201).json({
+            success: true,
+            message: "Register success"
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Server error"
+        });
+    }
+};
+
+module.exports = { login, getAllProducts, getAllCustomers, register };
 const getAllProducts = async (req, res) => {
     try {
         const result = await db.query("SELECT * FROM products");
