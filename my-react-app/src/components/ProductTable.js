@@ -7,33 +7,42 @@ function ProductTable() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
 
-  useEffect(function () {
-    var token = localStorage.getItem("token");
-
-    api.get("api/products", {
+  function loadProducts() {
+    const token = localStorage.getItem("token");
+    api.get("/api/products", {
       headers: { Authorization: "Bearer " + token }
-    })
-      .then(function (res) {
-        setItems(res.data);
-        setLoading(false);
-      })
-      .catch(function (err) {
-        var msg = "โหลดรายการสินค้าไม่สำเร็จ";
-        if (err && err.response && err.response.data && err.response.data.error) {
-          msg = err.response.data.error;
-        }
-        setMessage(msg);
-        setLoading(false);
-      });
-  }, []); // โหลดครั้งแรกเมื่อ component mount
-
-  if (loading) {
-    return <p>Loading products...</p>;
+    }).then((res) => {
+      setItems(res.data);
+      setLoading(false);
+    }).catch((err) => {
+      const msg = err?.response?.data?.error || "โหลดรายการสินค้าไม่สำเร็จ";
+      setMessage(msg);
+      setLoading(false);
+    });
   }
 
-  if (message) {
-    return <p style={{ color: "red" }}>{message}</p>;
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  function handleDelete(id) {
+    const ok = window.confirm("ต้องการลบสินค้ารายการนี้หรือไม่?");
+    if (!ok) return;
+
+    const token = localStorage.getItem("token");
+    api.delete("/api/products/" + id, {
+      headers: { Authorization: "Bearer " + token }
+    }).then((res) => {
+      loadProducts();
+      alert("ลบสินค้าสำเร็จ (ID: " + res.data.product.id + ")");
+    }).catch((err) => {
+      const msg = err?.response?.data?.error || "ลบไม่สำเร็จ";
+      alert(msg);
+    });
   }
+
+  if (loading) return <p>Loading products...</p>;
+  if (message) return <p style={{ color: "red" }}>{message}</p>;
 
   return (
     <div>
@@ -41,34 +50,35 @@ function ProductTable() {
       <table border="1" cellPadding="6" cellSpacing="0">
         <thead>
           <tr>
-            <th style={{ textAlign: "left" }}>ID</th>
-            <th style={{ textAlign: "left" }}>Name</th>
-            <th style={{ textAlign: "left" }}>Category</th>
-            <th style={{ textAlign: "right" }}>Price</th>
-            <th style={{ textAlign: "right" }}>Stock</th>
-            <th style={{ textAlign: "center" }}>Action</th>
+            <th style={{textAlign:"left"}}>ID</th>
+            <th style={{textAlign:"left"}}>Name</th>
+            <th style={{textAlign:"left"}}>Category</th>
+            <th style={{textAlign:"right"}}>Price</th>
+            <th style={{textAlign:"right"}}>Stock</th>
+            <th style={{textAlign:"center"}}>Action</th>
           </tr>
         </thead>
         <tbody>
-          {items && items.map(function (item) {
-            return (
-              <tr key={item.id}>
-                <td>{item.id}</td>
-                <td>{item.name}</td>
-                <td>{item.category}</td>
-                <td style={{ textAlign: "right" }}>{Number(item.price).toFixed(2)}</td>
-                <td style={{ textAlign: "right" }}>{item.stock}</td>
-                <td style={{ textAlign: "center" }}>
-                  <Link to={"/admin/products/" + item.id + "/edit"}>
-                    <button>Edit</button>
-                  </Link>
-                </td>
-              </tr>
-            );
-          })}
+          {items && items.map((item) => (
+            <tr key={item.id}>
+              <td>{item.id}</td>
+              <td>{item.name}</td>
+              <td>{item.category}</td>
+              <td style={{textAlign:"right"}}>{Number(item.price).toFixed(2)}</td>
+              <td style={{textAlign:"right"}}>{item.stock}</td>
+              <td style={{textAlign:"center"}}>
+                <Link to={"/admin/products/" + item.id + "/edit"}>
+                  <button>Edit</button>
+                </Link>
+              </td>
+              <td style={{textAlign:"center"}}>
+                <button onClick={() => handleDelete(item.id)}>Delete</button>
+              </td>
+            </tr>
+          ))}
           {(!items || items.length === 0) && (
             <tr>
-              <td colSpan="6">ยังไม่มีสินค้า</td>
+              <td colSpan="7">ยังไม่มีสินค้า</td>
             </tr>
           )}
         </tbody>

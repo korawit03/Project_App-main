@@ -2,6 +2,8 @@ import React from "react";
 import { Link, Routes, Route } from "react-router-dom";
 import ProductTable from "./ProductTable";
 import ProductCreate from "./ProductCreate";
+import ProductEdit from "./ProductEdit";
+
 function AdminPage() {
          return (
                   <div>
@@ -23,6 +25,7 @@ function AdminPage() {
                            <Routes>
                                     <Route path="products" element={<ProductTable />} />
                                     <Route path="products/new" element={<ProductCreate />} />
+                                    <Route path="products/:id/edit" element={<ProductEdit />} />
                            </Routes>
                   </div>
          );
